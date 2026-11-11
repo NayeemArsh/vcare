@@ -11,6 +11,8 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v4
+      - name: Install Wrangler
+        run: npm install -g wrangler
       - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
