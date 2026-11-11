@@ -11,14 +11,25 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v4
-      - name: Install Wrangler
-        run: npm install -g wrangler
-      - name: Deploy with Wrangler
-        uses: cloudflare/wrangler-action@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler --allow-scripts=esbuild,workerd
+
+      - name: Deploy to Cloudflare
+        run: |
+          npx wrangler deploy worker.mjs --config wrangler.toml \
+            --var TELEGRAM_BOT_TOKEN:"$TELEGRAM_BOT_TOKEN" \
+            --var TELEGRAM_CHAT_ID:"$TELEGRAM_CHAT_ID" \
+            --var DHAN_ACCESS_TOKEN:"$DHAN_ACCESS_TOKEN" \
+            --var DHAN_CLIENT_ID:"$DHAN_CLIENT_ID"
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
